@@ -14,15 +14,19 @@
 | 项目 | 说明 |
 |------|------|
 | 节点名称 | Size Selection |
-| 分类 | ⚡️穿山阅海 |
 | 作者 | 穿山阅海 |
 | 版本 | 1.0 |
+
+## 🖼️ 节点预览
+<p align="center">
+  <img src="https://github.com/xujianjian2004/ComfyUI-Size-Selection/blob/main/ComfyUI-Size-Selection-Preview.jpg?raw=true" width="800"/>
+</p>
 
 ### 两种工作模式
 
 **▼ Preset（预设模式）**
 - 4 档分辨率 × 9 种宽高比，点选即用
-  - Draft (0.15~0.45MP) · Standard (0.45~1.0MP) · High (1.0~3.0MP) · Ultra (3.0~5.0MP)
+  - Draft (0.15-0.45MP) · Standard (0.45-1.0MP) · High (1.0-3.0MP) · Ultra (3.0-5.0MP)
 - 图形化按钮组 + SVG 比例图标，视觉直观
 - 实时预览框显示对应像素尺寸
 
@@ -36,7 +40,7 @@
 
 按**总像素量**分四档，所有尺寸均整除 8，横竖比例严格对称。
 
-| 宽高比 | Draft（0.15~0.45MP） | Standard（0.45~1.0MP） | High（1.0~3.0MP） | Ultra（3.0~5.0MP） |
+| 宽高比 | Draft（0.15-0.45MP） | Standard（0.45-1.0MP） | High（1.0-3.0MP） | Ultra（3.0-5.0MP） |
 |--------|--------------------|-----------------------|-----------------|------------------|
 | 21:9   | 768×328            | 1280×544              | 2560×1080       | 3440×1440        |
 | 16:9   | 640×360            | 1280×720              | 1920×1080       | 2560×1440        |
@@ -60,7 +64,7 @@
 | 名称 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `Manual_Mode` | COMBO | ✅ | `off` = Preset，`on` = Custom |
-| `Resolution` | COMBO | ➖ | 分辨率档位：Draft (0.15~0.45MP) / Standard (0.45~1.0MP) / High (1.0~3.0MP) / Ultra (3.0~5.0MP)（Preset 模式有效） |
+| `Resolution` | COMBO | ➖ | 分辨率档位：Draft (0.15-0.45MP) / Standard (0.45-1.0MP) / High (1.0-3.0MP) / Ultra (3.0-5.0MP)（Preset 模式有效） |
 | `Aspect_Ratio` | COMBO | ➖ | 宽高比，9 种可选（Preset 模式有效） |
 | `Custom_Width` | INT | ➖ | 自定义宽度，256–2048 px，步长 8（Custom 模式有效） |
 | `Custom_Height` | INT | ➖ | 自定义高度，256–2048 px，步长 8（Custom 模式有效） |
