@@ -1,6 +1,7 @@
 # ComfyUI-Size-Selection
 
 一个轻量、直观的ComfyUI尺寸选择节点，支持**预设分辨率快速选择**与**自定义宽高输入**，输出 `width` 和 `height` 整数，可直接接入任何下游节点。
+A lightweight and intuitive ComfyUI size selection node that supports quick selection of preset resolutions and custom width and height input, outputting width and height as integers, which can be directly connected to any downstream node.
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
@@ -13,12 +14,12 @@
 
 - 预设分辨率快速选择（Draft / Standard / High / Ultra × 9 种宽高比）
 - 自定义宽高输入，自动向下对齐 8 的倍数
-- ↕ 一键互换宽高
+- ⇄ 一键互换宽高
 - 实时尺寸预览
 
 ## 🖼️ 节点预览
 <p align="center">
-  <img src="https://github.com/xujianjian2004/ComfyUI-Size-Selection/blob/main/ComfyUI-Size-Selection-Preview.jpg?raw=true" width="800"/>
+  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/ComfyUI-Size-Selection-Preview.jpg" width="800"/>
 </p>
 
 ### 两种工作模式
@@ -31,7 +32,7 @@
 
 **▲ Custom（自定义模式）**
 - 手动输入宽高（256–2048 px），自动向下对齐 8 的倍数
-- **↕ Swap Width & Height**：一键互换宽高，横竖切换无缝
+- **⇄ Swap Width & Height**：一键互换宽高，横竖切换无缝
 
 ---
 
