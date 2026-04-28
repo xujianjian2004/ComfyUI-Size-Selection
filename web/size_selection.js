@@ -28,23 +28,23 @@ const RESOLUTION_DATA = {
 // ── 分辨率按钮中文显示标签（两行：档位名 + 像素量范围）──────────────────────
 // 注：数据 key 保持英文以匹配后端，仅 label 做中文化
 const RESOLUTION_LABELS = {
-    "Draft (0.15~0.45MP)":   "草稿 (0.15~0.45MP)",
+    "Draft (0.15~0.45MP)": "普清 (0.15~0.45MP)",
     "Standard (0.45~1.0MP)": "标清 (0.45~1.0MP)",
-    "High (1.0~3.0MP)":      "高清 (1.0~3.0MP)",
-    "Ultra (3.0~5.0MP)":     "超高清 (3.0~5.0MP)",
+    "High (1.0~3.0MP)":"高清 (1.0~3.0MP)",
+    "Ultra (3.0~5.0MP)": "超清 (3.0~5.0MP)",
 };
 
 // ── 宽高比中文显示标签 ────────────────────────────────────────────────────────
 const ASPECT_RATIO_LABELS = {
-    "21:9":  "21:9 超宽屏",
-    "16:9":  "16:9 宽屏",
-    "3:2":   "3:2 标准照片",
-    "4:3":   "4:3 全屏",
-    "1:1":   "1:1 正方形",
-    "3:4":   "3:4 竖屏",
-    "2:3":   "2:3 高竖屏",
+    "21:9":  "21:9 超宽荧幕",
+    "16:9":  "16:9 手机横屏",
+    "3:2":   "3:2 经典画幅",
+    "4:3":   "4:3 老式标清",
+    "1:1":   "1:1 标准方形",
+    "3:4":   "3:4 常用竖屏",
+    "2:3":   "2:3 竖屏海报",
     "9:16":  "9:16 手机竖屏",
-    "9:21":  "9:21 超高屏",
+    "9:21":  "9:21 超高竖屏",
 };
 
 // ── 宽高比分组（Landscape=横向 / Portrait=纵向 / Square=正方形）───────────────
@@ -219,6 +219,33 @@ function buildUI(node) {
         clearTimeout(_vueMinWidthTimeout);
         _ac.abort();           // 一次性中止所有通过 _ac.signal 注册的 DOM 监听
         _origOnRemoved?.();    // 调用原始 onRemoved（如有）
+    };
+
+    // ── 加载兼容：提前预隐藏原生 widget，避免轮询延迟期间引起错位 ─────────────────
+    // 问题根因：waitForWidgets 异步触发，但 ComfyUI 从 JSON 载入时是同步的。
+    // 在轮询完成之前，所有原生 widget（manW/resW/aspW 等）均处于可见状态，
+    // 撑开节点高度导致 DOM 面板尚未挂载时出现布局错位。
+    // 解决方案：立即将原生 widget 折叠为零高度（保留在数组中，
+    // 确保 configure() 仍能按索引正确赋值），等待轮询完成后由 applyMode 按需恢复显示。
+    if (node.widgets) {
+        for (const w of node.widgets) {
+            if (w.name === "Manual_Mode") continue; // manW 由 applyMode 管理，始终保持可见
+            w.hidden = true;
+            w.computeSize = () => [0, -4];
+        }
+    }
+
+    // 拦截 onConfigure：工作流载入时，ComfyUI 会先通过 configure() 把 JSON 中保存的
+    // node.size 写回节点，再调用 onConfigure 钩子。
+    // 此处在钩子中立即根据已恢复的 Manual_Mode 值修正节点高度，
+    // 防止保存值与 getFixedHeight() 不一致导致的画布错位跳动。
+    const _origOnConfigure = node.onConfigure;
+    node.onConfigure = function (info) {
+        _origOnConfigure?.apply(this, arguments);
+        if (Array.isArray(info?.widgets_values) && info.widgets_values.length > 0) {
+            const isMan = info.widgets_values[0] === "on";
+            node.size[1] = getFixedHeight(isMan);
+        }
     };
 
     // 等待三个核心 widget 就绪后初始化 UI
@@ -423,7 +450,7 @@ function buildUI(node) {
         // 互换宽高按钮
         const swapBtn = document.createElement("button");
         swapBtn.className = "ss-swap-btn";
-        swapBtn.textContent = "⇄ 互换宽高参数";
+        swapBtn.textContent = "⇄ 互换宽高数值";
         swapBtn.onclick = () => {
             [baseWidth, baseHeight] = [baseHeight, baseWidth];
             updateWidgetValue(cusW, baseWidth);
