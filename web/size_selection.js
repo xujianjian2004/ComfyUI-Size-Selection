@@ -30,7 +30,7 @@ const RESOLUTION_DATA = {
 const RESOLUTION_LABELS = {
     "Draft (0.15~0.45MP)": "普清 (0.15~0.45MP)",
     "Standard (0.45~1.0MP)": "标清 (0.45~1.0MP)",
-    "High (1.0~3.0MP)":"高清 (1.0~3.0MP)",
+    "High (1.0~3.0MP)": "高清 (1.0~3.0MP)",
     "Ultra (3.0~5.0MP)": "超清 (3.0~5.0MP)",
 };
 
@@ -69,8 +69,8 @@ const RATIO_ICON = {
 
 // ── CSS 样式（只注入一次，多节点共用）──────────────────────────────────────────
 const CSS = `
-.ss-wrap{padding:6px 8px;font-family:system-ui,sans-serif;user-select:none;box-sizing:border-box;width:100%;max-width:100%;overflow:hidden;display:flex;flex-direction:column;contain:layout style;position:relative}
-.ss-content{flex:1;overflow:hidden;min-height:0;max-width:100%}
+.ss-wrap{padding:6px 8px;font-family:system-ui,sans-serif;user-select:none;box-sizing:border-box;width:100%;max-width:100%;display:flex;flex-direction:column;contain:layout style;position:relative}
+.ss-content{flex:0 1 auto;overflow:hidden;min-height:0;max-width:100%}
 .ss-hidden{display:none!important;height:0!important;overflow:hidden!important;padding:0!important;margin:0!important}
 .ss-sec{font-size:11px;font-weight:700;color:#9a9a9a;letter-spacing:.06em;margin:13px 0 5px;display:flex;align-items:center;gap:5px}
 .ss-sec::before{content:"";width:5px;height:5px;border-radius:50%;background:#4caf80;flex-shrink:0}
@@ -96,21 +96,21 @@ const CSS = `
 .ss-ar-btn-sq .ar-label{font-size:8px;white-space:nowrap;overflow:visible;max-width:none}
 .ss-swap-btn{width:100%;margin-top:9px;padding:8px 0;border-radius:6px;border:1.5px solid #3c3c3c;background:#272727;color:#b0b0b0;font-size:14px;font-weight:700;cursor:pointer;text-align:center;letter-spacing:.04em}
 .ss-swap-btn:hover{border-color:#5aaf7a;color:#e8e8e8;background:#1e3328}
-.ss-preview{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:13px;padding:0 12px;background:#1a4530;border-radius:6px;border:1.5px solid #ffb347;color:#fff;height:38px;box-sizing:border-box;overflow:hidden}
+.ss-preview{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:13px;padding:0 12px;background:#1a4530;border-radius:6px;border:1.5px solid #ffb347;color:#fff;height:38px;box-sizing:border-box}
 .ss-preview.flash{animation:ss-flash-box 0.8s ease-in-out}
 @keyframes ss-flash-box{0%,100%{border-color:#ffb347;box-shadow:none}50%{border-color:#ffd700;box-shadow:0 0 15px rgba(255,215,0,0.6)}}
 .ss-preview.flash .ss-preview-val{animation:ss-flash-text 0.8s ease-in-out}
 @keyframes ss-flash-text{0%,100%{color:#fff}50%{color:#ffd700}}
 @media(prefers-reduced-motion:reduce){.ss-preview.flash,.ss-preview.flash .ss-preview-val{animation:none!important}}
-.ss-preview-lbl{font-size:16px;color:#fff;white-space:nowrap;flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.ss-preview-val{font-size:17px;font-weight:800;color:#fff;letter-spacing:.08em;white-space:nowrap;flex-shrink:0;text-align:right}
-.ss-copyright{margin-top:6px;margin-left:-8px;margin-right:-8px;padding:6px 10px;border-top:1px solid #2e2e2e;text-align:center;flex-shrink:0}
+.ss-preview-lbl{font-size:14px;color:#fff;white-space:nowrap}
+.ss-preview-val{font-size:14px;font-weight:800;color:#fff;letter-spacing:.08em;white-space:nowrap}
+.ss-copyright{margin-top:auto;margin-left:-8px;margin-right:-8px;padding:4px 10px;border-top:1px solid #2e2e2e;text-align:center;flex-shrink:0}
 .ss-copyright span{color:#666;font-size:10px;letter-spacing:0.5px;white-space:nowrap}
 `;
 
 // ── 工具函数 ──────────────────────────────────────────────────────────────────
 
-/** 根据模式返回节点固定高度（像素）：自定义模式=320，预设模式=680 */
+/** 根据模式返回节点固定高度（像素）：自定义模式=340，预设模式=690 */
 function getFixedHeight(manual) {
     return manual ? 340 : 690;
 }
@@ -242,7 +242,8 @@ function buildUI(node) {
     const _origOnConfigure = node.onConfigure;
     node.onConfigure = function (info) {
         _origOnConfigure?.apply(this, arguments);
-        if (Array.isArray(info?.widgets_values) && info.widgets_values.length > 0) {
+        if (Array.isArray(info?.widgets_values) && info.widgets_values.length > 0 && node.size) {
+            // widgets_values[0] 对应 Manual_Mode（后端 required 字段，始终在首位）
             const isMan = info.widgets_values[0] === "on";
             node.size[1] = getFixedHeight(isMan);
         }
@@ -326,8 +327,8 @@ function buildUI(node) {
         }
 
         // 设置节点最小尺寸，防止过窄导致按钮溢出
-        node.minSize = [340, 150];
-        if (node.size[0] < 340) node.size[0] = 340;
+        node.minSize = [280, 150];
+        if (node.size[0] < 280) node.size[0] = 280;
 
         // ── DOM 结构构建 ──────────────────────────────────────────────────────
         const wrap = document.createElement("div");
@@ -335,7 +336,8 @@ function buildUI(node) {
         // translate="no"：阻止浏览器翻译插件干扰按钮文字
         wrap.setAttribute("translate", "no");
         // 显式设置像素宽度，防止 DOM widget 在首次布局前溢出节点边界
-        wrap.style.width = node.size[0] + "px";
+        // 使用可选链 + 默认值 280，防止 node.size 在极少数情况下尚未初始化
+        wrap.style.width = (node.size?.[0] || 280) + "px";
 
         const contentDiv = document.createElement("div");
         contentDiv.className = "ss-content";
@@ -383,7 +385,6 @@ function buildUI(node) {
             // 正则拆分：第一段为名称，第二段为括号内的像素量范围
             const m = label.match(/^(\S+)\s+(\(.+\))$/);
             b.innerHTML = m ? `<span>${m[1]}</span><span>${m[2]}</span>` : label;
-            b.title = lv; // 悬停显示英文原始 key，便于调试
             b.onclick = () => {
                 currentRes = lv;
                 resW.value = lv;
@@ -424,7 +425,6 @@ function buildUI(node) {
                 const b = document.createElement("button");
                 // 使用 filter(Boolean).join(" ") 避免空字符串产生多余空格
                 b.className = ["ss-ar-btn", r === currentAsp ? "active" : "", isSq ? "ss-ar-btn-sq" : ""].filter(Boolean).join(" ");
-                b.title = label;
                 // 直接使用预缓存图标字符串，避免重复 Math.round / 字符串拼接
                 const iconSvg = isSq ? ICON_CACHE_SQ[r] : ICON_CACHE[r];
                 b.innerHTML = `<span class="ar-icon">${iconSvg}</span>`
@@ -460,24 +460,30 @@ function buildUI(node) {
         };
         manPanel.appendChild(swapBtn);
         contentDiv.appendChild(manPanel);
-        contentDiv.appendChild(preview);
 
         // 版权栏
         const copyright = document.createElement("div");
         copyright.className = "ss-copyright";
         copyright.innerHTML = `<span>©2026 WOS AI Studio. Powered by 穿山阅海</span>`;
+
+        // preview 作为 wrap 的直接子节点插入（置于 contentDiv 与 copyright 之间）
+        // 目的：使其脱离 ss-content 的 overflow:hidden 裁切范围，
+        // 让 flash 动画的 box-shadow 光晕可以向左右两侧完整渲染，不被截断
+        wrap.appendChild(preview);
         wrap.appendChild(copyright);
 
         // ── 逻辑函数 ──────────────────────────────────────────────────────────
 
         /**
          * 触发预览条闪烁动画，提示数值已更新。
-         * 当用户开启"减少动效"选项时完全跳过（CSS + JS 双重保护）。
+         * 跳过条件（CSS + JS 双重保护）：
+         *   - 用户开启"减少动效"无障碍选项
+         *   - 标签页当前处于后台隐藏状态（节省低配设备 GPU/CPU reflow 开销）
          */
         function flashPreview() {
-            if (_prefersReducedMotion()) return;
+            if (_prefersReducedMotion() || document.hidden) return;
             preview.classList.remove("flash");
-            void preview.offsetWidth; // 强制重排以重新触发 CSS 动画
+            void preview.offsetWidth; // 强制重排以重新触发 CSS animation（标准做法，此处为刻意行为）
             preview.classList.add("flash");
         }
 
@@ -570,8 +576,10 @@ function buildUI(node) {
         function updateNodeHeight() {
             const h = getFixedHeight(isManual);
             _targetHeight = h;
-            node.size = [node.size[0], h];
-            wrap.style.width = node.size[0] + "px"; // 同步保持宽度一致
+            // 使用可选链防止 node.size 在节点销毁竞态中为 null
+            const curW = node.size?.[0] || 280;
+            node.size = [curW, h];
+            wrap.style.width = curW + "px"; // 同步保持宽度一致
             if (node.element?.style) {
                 node.element.style.removeProperty("height");
                 node.element.style.removeProperty("min-height");
@@ -691,8 +699,8 @@ function buildUI(node) {
         node.computeSize = function (out) {
             const s = _origComputeSize
                 ? _origComputeSize(out)
-                : [node.size[0] || 340, getFixedHeight(isManual)];
-            const w = Math.max(node.minSize?.[0] || 340, s[0]);
+                : [node.size?.[0] || 280, getFixedHeight(isManual)];
+            const w = Math.max(node.minSize?.[0] || 280, s[0]);
             wrap.style.width = w + "px";
             return [w, getFixedHeight(isManual)];
         };
@@ -704,10 +712,13 @@ function buildUI(node) {
         applyMode(isManual);
 
         // 下一帧计算版权栏实际宽度，动态设置节点最小尺寸
+        // scrollWidth 需在元素插入 DOM 且完成布局后才有效，故放在 rAF 中读取
         requestAnimationFrame(() => {
             const copyrightSpan = copyright.querySelector("span");
-            const textW = copyrightSpan?.scrollWidth || 340;
-            const minW  = Math.max(textW + 16, 340);
+            const textW = (copyrightSpan && copyrightSpan.scrollWidth > 0)
+                ? copyrightSpan.scrollWidth
+                : 260; // 版权文字 fallback 宽度估算（约 26 字符 × 10px）
+            const minW  = Math.max(textW + 16, 280);
             const minH  = 45 + 12 + (copyright.offsetHeight || 44);
             node.minSize = [minW, minH];
 
@@ -753,7 +764,7 @@ function buildUI(node) {
 
         let _lastWidth = node.size[0];
         _resizeInterval = setInterval(() => {
-            if (_resizePaused) return;
+            if (_resizePaused || !node.size) return;
             const curH = node.size[1];
             const curW = node.size[0];
             // 水平方向调整：同步 wrap 宽度

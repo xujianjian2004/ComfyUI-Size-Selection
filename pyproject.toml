@@ -36,8 +36,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage      = "https://github.com/xujianjian2004/ComfyUI-Size-Selection"
-"Bug Tracker" = "https://github.com/xujianjian2004/ComfyUI-Size-Selection/issues"
+Homepage        = "https://github.com/xujianjian2004/ComfyUI-Size-Selection"
+"Bug Tracker"   = "https://github.com/xujianjian2004/ComfyUI-Size-Selection/issues"
+"Source Code"   = "https://github.com/xujianjian2004/ComfyUI-Size-Selection"
 
 [tool.setuptools.packages.find]
 where   = ["."]

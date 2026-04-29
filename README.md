@@ -12,7 +12,7 @@ A lightweight and intuitive ComfyUI size selection node that supports quick sele
 
 ## ✨ 功能特性
 
-- 预设分辨率快速选择（Draft / Standard / High / Ultra × 9 种宽高比）
+- 预设分辨率快速选择（普清 / 标清 / 高清h / 超清 × 9 种宽高比）
 - 自定义宽高输入，自动向下对齐 8 的倍数
 - ⇄ 一键互换宽高
 - 实时尺寸预览
@@ -26,13 +26,13 @@ A lightweight and intuitive ComfyUI size selection node that supports quick sele
 
 **▼ Preset（预设模式）**
 - 4 档分辨率 × 9 种宽高比，点选即用
-  - Draft (0.15-0.45MP) · Standard (0.45-1.0MP) · High (1.0-3.0MP) · Ultra (3.0-5.0MP)
+  - 普清(0.15-0.45MP) ·标清 (0.45-1.0MP) · 高清 (1.0-3.0MP) · 超清 (3.0-5.0MP)
 - 图形化按钮组 + SVG 比例图标，视觉直观
 - 实时预览框显示对应像素尺寸
 
 **▲ Custom（自定义模式）**
 - 手动输入宽高（256–2048 px），自动向下对齐 8 的倍数
-- **⇄ Swap Width & Height**：一键互换宽高，横竖切换无缝
+- **⇄互换宽高数值**：一键互换宽高，横竖切换无缝
 
 ---
 
@@ -40,7 +40,7 @@ A lightweight and intuitive ComfyUI size selection node that supports quick sele
 
 按**总像素量**分四档，所有尺寸均整除 8，横竖比例严格对称。
 
-| 宽高比 | Draft（0.15-0.45MP） | Standard（0.45-1.0MP） | High（1.0-3.0MP） | Ultra（3.0-5.0MP） |
+| 宽高比 | 普清（0.15-0.45MP） | 标清（0.45-1.0MP） | 高清（1.0-3.0MP） | 超清（3.0-5.0MP） |
 |--------|--------------------|-----------------------|-----------------|------------------|
 | 21:9   | 768×328            | 1280×544              | 2560×1080       | 3440×1440        |
 | 16:9   | 640×360            | 1280×720              | 1920×1080       | 2560×1440        |
@@ -63,11 +63,11 @@ A lightweight and intuitive ComfyUI size selection node that supports quick sele
 
 | 名称 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `Manual_Mode` | COMBO | ✅ | `off` = Preset，`on` = Custom |
-| `Resolution` | COMBO | ➖ | 分辨率档位：Draft (0.15-0.45MP) / Standard (0.45-1.0MP) / High (1.0-3.0MP) / Ultra (3.0-5.0MP)（Preset 模式有效） |
+| `Manual_Mode` | COMBO | ✅ | `off` = 预设模式，`on` = 自定义模式 |
+| `Resolution` | COMBO | ➖ | 分辨率档位：普清(0.15-0.45MP) ·标清 (0.45-1.0MP) · 高清 (1.0-3.0MP) · 超清 (3.0-5.0MP)（预设模式有效） |
 | `Aspect_Ratio` | COMBO | ➖ | 宽高比，9 种可选（Preset 模式有效） |
-| `Custom_Width` | INT | ➖ | 自定义宽度，256–2048 px，步长 8（Custom 模式有效） |
-| `Custom_Height` | INT | ➖ | 自定义高度，256–2048 px，步长 8（Custom 模式有效） |
+| `Custom_Width` | INT | ➖ | 自定义宽度，256–2048 px，步长 8（自定义模式有效） |
+| `Custom_Height` | INT | ➖ | 自定义高度，256–2048 px，步长 8（自定义模式有效） |
 
 ### 输出参数
 
@@ -96,7 +96,7 @@ git clone https://github.com/xujianjian2004/ComfyUI-Size-Selection.git
 
 ## 🔗 典型工作流接线
 
-**Preset 模式 → EmptyLatentImage**
+**预设模式 → EmptyLatentImage**
 ```
 [Size Selection]
     ├── width  ──→ [Empty Latent Image].width
@@ -119,7 +119,7 @@ git clone https://github.com/xujianjian2004/ComfyUI-Size-Selection.git
 - 使用：在画布空白处双击或左侧"节点"中，搜索"Size Selection"。
 - Custom 模式下宽高输入会自动**向下取整对齐到 8 的倍数**（如 `265` → `264`）。
 - `Manual_Mode` 原生下拉框与 Preset / Custom 按钮保持**双向同步**，两种方式切换效果相同。
-- 点击 **↕ Swap Width & Height** 会直接互换 `Custom_Width` 与 `Custom_Height` 的值。
+- 点击 **⇄ 互换宽高数值** 会直接互换 `Custom_Width` 与 `Custom_Height` 的值。
 - 前端依赖 ComfyUI `app.js` 模块，需要 **ComfyUI 0.2.0 或更高版本**。
 
 ---

@@ -10,8 +10,8 @@ ComfyUI Size Selection Node — Python 后端
 输入（可选）：
   Resolution    — 分辨率档位（Draft / Standard / High / Ultra）
   Aspect_Ratio  — 宽高比（共 9 种）
-  Custom_Width  — 自定义宽度（仅 Manual_Mode="on" 时生效）
-  Custom_Height — 自定义高度（仅 Manual_Mode="on" 时生效）
+  Custom_Width  — 自定义宽度（仅 Manual_Mode="on" 时生效，256–2048 px）
+  Custom_Height — 自定义高度（仅 Manual_Mode="on" 时生效，256–2048 px）
 
 输出：
   width  (INT) — 目标宽度，已对齐至 8 的倍数
@@ -27,7 +27,7 @@ ComfyUI Size Selection Node — Python 后端
 """
 
 import math
-from typing import Optional
+from typing import Optional  # Python 3.9 兼容；3.10+ 可用 str | None 语法
 
 # ── 预设分辨率数据 ─────────────────────────────────────────────────────────────
 # 结构：{档位名称: {宽高比: (宽, 高)}}
@@ -158,6 +158,6 @@ class ComfyUI_Size_Selection:
         Custom_Width: int = 512,
         Custom_Height: int = 512,
         **kwargs,
-    ) -> tuple:
+    ) -> tuple[str, Optional[str], Optional[str], int, int]:
         """返回值变化时触发节点重新计算，将所有影响输出的参数打包为元组作为比较键。"""
         return (Manual_Mode, Resolution, Aspect_Ratio, Custom_Width, Custom_Height)
