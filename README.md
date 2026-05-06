@@ -147,4 +147,4 @@ ComfyUI-Size-Selection/
 
 未经明确授权，严禁以任何形式集成、修改或再分发。
 
-MIT © 2026 穿山阅海
+WOS AI STUDIO © 穿山阅海
