@@ -145,6 +145,6 @@ ComfyUI-Size-Selection/
 
 ## 📄 License
 
-本项目采用 [MIT License](LICENSE) 开源协议。
+未经明确授权，严禁以任何形式集成、修改或再分发。
 
 MIT © 2026 穿山阅海
