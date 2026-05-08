@@ -1,6 +1,6 @@
 # ComfyUI-Size-Selection
 
-一个轻量、直观的 ComfyUI 尺寸选择节点（已适配 Nodes 2.0），支持**四档预设分辨率快速选择**与**自定义宽高输入**，输出 `width` 和 `height` 整数，可直接接入任何下游节点。
+一个轻量、直观的 ComfyUI 尺寸选择节点（已适配 Nodes 2.0），支持**预设分辨率快速选择**与**自定义宽高输入**，输出 `width` 和 `height` 整数，可直接接入任何下游节点。
 
 A lightweight and intuitive ComfyUI size selection node. Supports quick selection across 4 preset resolution tiers × 9 aspect ratios, plus a fully custom mode with live preview. Outputs `width` and `height` integers directly connectable to any downstream node.
 
