@@ -4,14 +4,6 @@
 
 A lightweight and intuitive ComfyUI size selection node. Supports quick selection across 4 preset resolution tiers × 9 aspect ratios, plus a fully custom mode with live preview. Outputs `width` and `height` integers directly connectable to any downstream node.
 
-![License](https://img.shields.io/badge/license-MIT-green)
-
-![Python](https://img.shields.io/badge/python-3.9%2B-blue)
-
-![ComfyUI](https://img.shields.io/badge/ComfyUI-0.2.0%2B-orange)
-
-![Version](https://img.shields.io/badge/version-2.0-brightgreen)
-
 ---
 
 ## ✨ 功能特性
@@ -25,7 +17,7 @@ A lightweight and intuitive ComfyUI size selection node. Supports quick selectio
 ## 🖼️ 节点预览
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/ComfyUI-Size-Selection-Preview.jpg" width="800"/>
+  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-LiteGraph.png" width="800"/>
 </p>
 
 ### 两种工作模式
