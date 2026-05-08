@@ -18,9 +18,7 @@ A lightweight and intuitive ComfyUI size selection node. Supports quick selectio
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-LiteGraph.png" width="800"/>
-</p>
-<p align="center">
-  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-Nodes%202.0.png" width="800"/>
+  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-Nodes2.0.png" width="800"/>
 </p>
 
 ### 两种工作模式
