@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "comfyui-size-selection"
 version = "2.0"
-description = "ComfyUI custom node for selecting image resolutions via a graphical UI. Supports 4 preset tiers (SD/HD/FHD/QHD) × 9 aspect ratios with hover tooltips, plus a custom mode with live preview. Outputs width and height integers for any downstream node."
+description = "ComfyUI custom node for selecting image resolutions via a graphical UI. Supports 4 preset tiers (SD/HD/FHD/QHD) × 9 aspect ratios, plus a custom mode with live preview. Outputs width and height integers for any downstream node."
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
