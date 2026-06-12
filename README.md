@@ -2,30 +2,30 @@
 
 一个轻量、直观的 ComfyUI 尺寸选择节点（已适配 Nodes 2.0），支持**预设分辨率快速选择**与**自定义宽高输入**，输出 `width` 和 `height` 整数，可直接接入任何下游节点。
 
-A lightweight and intuitive ComfyUI size selection node. Supports quick selection across 4 preset resolution tiers × 9 aspect ratios, plus a fully custom mode with live preview. Outputs `width` and `height` integers directly connectable to any downstream node.
+A lightweight and intuitive ComfyUI size selection node. Supports quick selection across 4 preset resolution tiers × 8 aspect ratios, plus a fully custom mode with live preview. Outputs `width` and `height` integers directly connectable to any downstream node.
 
 ---
 
 ## ✨ 功能特性
 
-- 四档预设分辨率（标清 SD / 高清 HD / 全高清 FHD / 超清 QHD）× 九种宽高比
+- 四档预设分辨率（标清 SD / 高清 HD / 全高清 FHD / 超清 QHD）× 八种宽高比
 - 自定义宽高输入（256–2048 px），自动向下对齐 8 的倍数
 - 一键互换宽高数值
 - 实时尺寸预览，切换即刷新
 - 兼容 LiteGraph 画布模式与 Nodes 2.0 Vue 渲染模式
+- 输入参数验证（VALIDATE_INPUTS）
 
 ## 🖼️ 节点预览
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-LiteGraph.png" width="800"/>
-  <img src="https://raw.githubusercontent.com/xujianjian2004/ComfyUI-Size-Selection/refs/heads/main/Preview-Nodes2.0.png" width="800"/>
 </p>
 
 ### 两种工作模式
 
 **▼ Preset（预设模式）**
 
-- 4 档分辨率 × 9 种宽高比，点选即用
+- 4 档分辨率 × 8 种宽高比，点选即用
   - 📺 标清 SD (0.2–0.4MP) · 📱 高清 HD (0.6–1.0MP) · 💻 全高清 FHD (1.1–2.8MP) · 🎬 超清 QHD (2.4–5.0MP)
 - 图形化按钮组 + SVG 比例图标
 - 实时预览格显示对应像素尺寸
@@ -43,15 +43,14 @@ A lightweight and intuitive ComfyUI size selection node. Supports quick selectio
 
 | 宽高比 | 📺 标清 SD<br>(0.2–0.4MP)≈480P | 📱 高清 HD<br>(0.6–1.0MP) ≈720P | 💻 全高清 FHD<br>(1.1–2.8MP) ≈1080P | 🎬 超清 QHD<br>(2.4–5.0MP) ≈2K+ |
 | --- | --- | --- | --- | --- |
-| 3:2 摄影横图 | 768×512 | 1152×768 | 1536×1024 | 2304×1536 |
-| 2:3 海报竖图 | 512×768 | 768×1152 | 1024×1536 | 1536×2304 |
-| 4:3 经典横图 | 512×384 | 1024×768 | 1280×960 | 2048×1536 |
-| 3:4 经典竖图 | 384×512 | 768×1024 | 960×1280 | 1536×2048 |
-| 16:9 壁纸横图 | 640×360 | 1280×720 | 1920×1080 | 2560×1440 |
-| 9:16 手机竖图 | 360×640 | 720×1280 | 1080×1920 | 1440×2560 |
-| 21:9 影视横图 | 768×328 | 1280×544 | 2560×1080 | 3440×1440 |
-| 9:21 超长竖图 | 328×768 | 544×1280 | 1080×2560 | 1440×3440 |
-| 1:1 正方形图 | 512×512 | 768×768 | 1024×1024 | 1536×1536 |
+| 3:2 | 768×512 | 1152×768 | 1536×1024 | 2304×1536 |
+| 2:3 | 512×768 | 768×1152 | 1024×1536 | 1536×2304 |
+| 4:3 | 512×384 | 1024×768 | 1280×960 | 2048×1536 |
+| 3:4 | 384×512 | 768×1024 | 960×1280 | 1536×2048 |
+| 16:9 | 640×360 | 1280×720 | 1920×1080 | 2560×1440 |
+| 9:16 | 360×640 | 720×1280 | 1080×1920 | 1440×2560 |
+| 21:9 | 768×328 | 1280×544 | 2560×1080 | 3440×1440 |
+| 1:1 | 512×512 | 768×768 | 1024×1024 | 1536×1536 |
 
 > 所有预设值均已对齐到 8 的倍数，与主流扩散模型 VAE 编码要求一致。
 
@@ -65,7 +64,7 @@ A lightweight and intuitive ComfyUI size selection node. Supports quick selectio
 | --- | --- | --- | --- |
 | `Manual_Mode` | COMBO | ✅ | `off` = 预设模式，`on` = 自定义模式 |
 | `Resolution` | COMBO | ➖ | 分辨率档位：SD · HD · FHD · QHD（预设模式有效） |
-| `Aspect_Ratio` | COMBO | ➖ | 宽高比，9 种可选（预设模式有效） |
+| `Aspect_Ratio` | COMBO | ➖ | 宽高比，8 种可选（预设模式有效） |
 | `Custom_Width` | INT | ➖ | 自定义宽度，256–2048 px，步长 8（自定义模式有效） |
 | `Custom_Height` | INT | ➖ | 自定义高度，256–2048 px，步长 8（自定义模式有效） |
 
@@ -150,6 +149,7 @@ ComfyUI-Size-Selection/
 
 | 版本 | 主要变更 |
 | --- | --- |
+| **2.1** | 优化 UI 布局与配色，删减 9:21 比例，添加 VALIDATE_INPUTS 验证，更新分辨率 key 格式（SD 480P 标清），修复版权信息，添加节点元信息（cnr_id/ver） |
 | **2.0** | 更新UI，配色美化，优化节点宽高，调整预设参数，修改界面文案，提升模式兼容性，其他大量优化 |
 | **1.1** | UI 重构：分辨率单行四列、宽高比两列配对网格、预览格嵌入、配色对齐 |
 | **1.0** | 初始版本 |
@@ -158,6 +158,6 @@ ComfyUI-Size-Selection/
 
 ## 📄 License
 
-COPYRIGHT © WOS AI STUDIO | 穿山阅海
+COPYRIGHT © WOSAI STUDIO | 穿山阅海
 
 详见 [LICENSE](./LICENSE) 文件。

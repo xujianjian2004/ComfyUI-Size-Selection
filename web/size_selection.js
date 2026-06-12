@@ -2,13 +2,13 @@
  * ComfyUI 尺寸选择节点 — 前端 UI
  *
  * 功能特性：
- *   - 预设模式：SD/HD/FHD/QHD 四档 × 9 种宽高比
+ *   - 预设模式：SD/HD/FHD/QHD 四档 × 8 种宽高比
  *   - 自定义模式：手动输入宽高（256–2048 px），一键互换宽高，对齐 8 倍数
  *   - 兼容经典 LiteGraph 画布模式与 Nodes 2.0 Vue 渲染模式
  *   - 工作流序列化/反序列化，节点高度锁定，内存安全清理
  *
- * @version 2.0
- * @author  穿山阅海
+ * @version 2.1
+ * @author  穿山阅海（WOSAI STUDIO）
  */
 
 import { app } from "../../scripts/app.js";
@@ -16,93 +16,123 @@ import { app } from "../../scripts/app.js";
 // ── 常量定义 ──────────────────────────────────────────────────────────────────
 const MAX_DIMENSION  = 2048;   // 自定义模式单边最大像素
 const MIN_DIMENSION  = 256;    // 自定义模式单边最小像素
-const DEFAULT_RES    = "FHD·1080P";  // 默认分辨率档位（与 Python 后端保持一致）
-const DEFAULT_RATIO  = "9:16 手机竖图";      // 默认宽高比（完整标签格式，与后端保持一致）
+const DEFAULT_RES    = "FHD 1080P 全高清";  // 默认分辨率档位（与 Python 后端保持一致）
+const DEFAULT_RATIO  = "9:16 Mobile 手机竖屏";  // 默认宽高比（完整标签格式，与后端保持一致）
 
 // ── 预设分辨率数据（与 Python 后端 RESOLUTION_DATA 完全一致）─────────────────
 const RESOLUTION_DATA = {
-    "SD·480P":  { "3:2":[768,512],  "2:3":[512,768],  "4:3":[512,384],  "3:4":[384,512],  "16:9":[640,360],  "9:16":[360,640],  "21:9":[768,328],  "9:21":[328,768],  "1:1":[512,512]  },
-    "HD·720P":  { "3:2":[1152,768], "2:3":[768,1152], "4:3":[1024,768], "3:4":[768,1024], "16:9":[1280,720], "9:16":[720,1280], "21:9":[1280,544], "9:21":[544,1280], "1:1":[768,768]  },
-    "FHD·1080P": { "3:2":[1536,1024],"2:3":[1024,1536],"4:3":[1280,960], "3:4":[960,1280], "16:9":[1920,1080],"9:16":[1080,1920],"21:9":[2560,1080],"9:21":[1080,2560],"1:1":[1024,1024]},
-    "QHD·2K+": { "3:2":[2304,1536],"2:3":[1536,2304],"4:3":[2048,1536],"3:4":[1536,2048],"16:9":[2560,1440],"9:16":[1440,2560],"21:9":[3440,1440],"9:21":[1440,3440],"1:1":[1536,1536]},
+    "SD 480P 标清":  { "3:2":[768,512],  "2:3":[512,768],  "4:3":[512,384],  "3:4":[384,512],  "16:9":[640,360],  "9:16":[360,640],  "21:9":[768,328],  "1:1":[512,512]  },
+    "HD 720P 高清":  { "3:2":[1152,768], "2:3":[768,1152], "4:3":[1024,768], "3:4":[768,1024], "16:9":[1280,720], "9:16":[720,1280], "21:9":[1280,544], "1:1":[768,768]  },
+    "FHD 1080P 全高清": { "3:2":[1536,1024],"2:3":[1024,1536],"4:3":[1280,960], "3:4":[960,1280], "16:9":[1920,1080],"9:16":[1080,1920],"21:9":[2560,1080],"1:1":[1024,1024]},
+    "QHD 2K+ 超清": { "3:2":[2304,1536],"2:3":[1536,2304],"4:3":[2048,1536],"3:4":[1536,2048],"16:9":[2560,1440],"9:16":[1440,2560],"21:9":[3440,1440],"1:1":[1536,1536]},
 };
 
 // ── 分辨率按钮短标签（单行显示）─────────────────────────────────────────────
 const RESOLUTION_SHORT_LABELS = {
-    "SD·480P":  "标 清",
-    "HD·720P":  "高 清",
-    "FHD·1080P": "全高清",
-    "QHD·2K+": "超 清",
+    "SD 480P 标清":  "标 清",
+    "HD 720P 高清":  "高 清",
+    "FHD 1080P 全高清": "全高清",
+    "QHD 2K+ 超清": "超 清",
 };
 
 // ── 宽高比中文显示标签 ────────────────────────────────────────────────────────
 const ASPECT_RATIO_LABELS = {
-    "21:9":  "21:9 影视横图",
-    "16:9":  "16:9 壁纸横图",
-    "3:2":   "3:2 摄影横图",
-    "4:3":   "4:3 经典横图",
-    "1:1":   "1:1 正方形图",
-    "3:4":   "3:4 经典竖图",
-    "2:3":   "2:3 海报竖图",
-    "9:16":  "9:16 手机竖图",
-    "9:21":  "9:21 超长竖图",
+    "3:2":   "3:2 Classic 经典胶片",
+    "2:3":   "2:3 Photo 人像照片",
+    "4:3":   "4:3 Standard 标准画幅",
+    "3:4":   "3:4 Portrait 竖幅人像",
+    "16:9":  "16:9 Widescreen 标准宽屏",
+    "9:16":  "9:16 Mobile 手机竖屏",
+    "21:9":  "21:9 Ultrawide 超宽银幕",
+    "1:1":   "1:1 Square 正方形",
 };
 
-// ── 宽高比配对布局：[横向, 纵向]，末行 null 表示预览格占位 ────────────────────
-const ASPECT_PAIRS = [
-    ["3:2",  "2:3" ],
-    ["4:3",  "3:4" ],
-    ["16:9", "9:16"],
-    ["21:9", "9:21"],
-    ["1:1",  null  ],  // null = 预览格
+// ── 宽高比网格布局：[4列]，预览格单独一行在底部 ─────────────────────────────
+const ASPECT_ROWS = [
+    ["9:16", "16:9", "21:9", "1:1"],
+    ["3:2",  "2:3",  "4:3",  "3:4"],
 ];
 
 // ── SVG 图标尺寸映射 [宽, 高]，用于生成各宽高比的预览图标 ─────────────────────
 const RATIO_ICON = {
-    "21:9":  [42, 18], "16:9": [36, 20], "3:2":  [33, 22], "4:3":  [28, 22],
-    "1:1":   [22, 22], "3:4":  [22, 28], "2:3":  [22, 33], "9:16": [20, 36], "9:21": [18, 42],
+    "3:2":  [33, 22], "2:3":  [22, 33],
+    "4:3":  [28, 22], "3:4":  [22, 28],
+    "16:9": [36, 20], "9:16": [20, 36],
+    "21:9": [42, 18],
+    "1:1":  [22, 22],
 };
 
 // ── CSS 样式（只注入一次，多节点共用）──────────────────────────────────────────
 const CSS = `
-.ss-wrap{padding:6px;font-family:system-ui,sans-serif;user-select:none;box-sizing:border-box;width:100%;max-width:100%;display:flex;flex-direction:column;contain:layout style;position:relative}
-.ss-content{flex:0 1 auto;overflow:visible;min-height:0;max-width:100%}
+/* ── CSS 变量（深色默认值）────────────────────────────────────── */
+.ss-wrap {
+    /* 背景 */
+    --ss-surface-2:      #1c1d20;
+    --ss-surface-3:      #131417;
+    /* 边框 */
+    --ss-border:          #383B44;
+    /* 文字 */
+    --ss-text:            #E4E4E7;
+    --ss-text-secondary:  #A3A3A3;
+    --ss-text-muted:      #7A7A7A;
+    /* 品牌色 */
+    --ss-accent:          #DD6F4A;
+    --ss-accent-hover:    rgba(221,111,74,.7);
+    --ss-accent-glow:     rgba(221,111,74,.55);
+    --ss-accent-dim:      rgba(221,111,74,.22);
+    /* 布局 */
+    padding:6px;font-family:system-ui,sans-serif;user-select:none;
+    box-sizing:border-box;width:100%;max-width:100%;height:100%;
+    display:flex;flex-direction:column;contain:layout style;
+    position:relative;color:#E4E4E7;
+}
 .ss-hidden{display:none!important;height:0!important;overflow:hidden!important;padding:0!important;margin:0!important}
-.ss-mode-row{display:flex;gap:8px;margin-bottom:6px}
-.ss-mode-btn{flex:1;padding:7px 6px;border-radius:6px;border:1.5px solid #3c3c3c;background:#222222;color:#a5a5a5;font-size:12px;font-weight:normal;cursor:pointer;text-align:center;white-space:nowrap}
-.ss-mode-btn:hover{border-color:#5a9a9a;color:#8ac8c8}
-.ss-mode-btn.active{background:#1a3a3a;border-color:#4a8a8a;color:#8ac8c8}
-.ss-res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:0;margin-bottom:6px}
-.ss-res-btn{position:relative;padding:8px 4px;border-radius:6px;border:1.5px solid #3c3c3c;background:#222222;color:#a5a5a5;font-size:11px;font-weight:normal;cursor:pointer;text-align:center;white-space:nowrap}
-.ss-res-btn:hover{border-color:#5a9a9a;color:#8ac8c8}
-.ss-res-btn.active{background:#1a3a3a;border-color:#4a8a8a;color:#8ac8c8}
-.ss-ar-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:0;padding-bottom:6px}
-.ss-ar-btn{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:3px;padding:5px 8px;border-radius:5px;border:1.5px solid #3c3c3c;background:#222;color:#aaa;cursor:pointer;min-width:0;min-height:40px}
-.ss-ar-btn .ar-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:24px;color:inherit}.ss-ar-btn .ar-icon svg{width:100%;height:100%;object-fit:contain;object-position:center center}
-.ss-ar-btn .ar-ratio{font-size:13px;font-weight:normal;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;width:40px;text-align:center;color:inherit}
-.ss-ar-btn:hover{border-color:#5a9a9a;color:#8ac8c8}
-.ss-ar-btn.active{background:#1a3a3a;border-color:#4a8a8a;color:#8ac8c8}
-.ss-preview-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:5px;border:1.5px solid #4a8a8a;background:#1a3a3a;cursor:default;min-height:40px;overflow:hidden}
-.ss-preview-cell-val{font-size:13px;font-weight:normal;color:#8ac8c8;letter-spacing:.02em;text-align:center;padding:4px 6px;line-height:1.3}
-.ss-preview-cell.flash,.ss-preview.flash{animation:ss-flash-border 0.8s ease-in-out}
-.ss-preview-cell.flash .ss-preview-cell-val,.ss-preview.flash .ss-preview-val{animation:ss-flash-text 0.8s ease-in-out}
-@keyframes ss-flash-border{0%,100%{border-color:#4a8a8a;box-shadow:none}50%{border-color:#8ac8c8;box-shadow:0 0 14px rgba(138,200,200,0.55)}}
-@keyframes ss-flash-text{0%,100%{color:#8ac8c8}50%{color:#a8d8d8}}
-.ss-swap-btn{width:100%;margin-top:8px;margin-bottom:8px;padding:7px 0;border-radius:6px;border:1.5px solid #3c3c3c;background:#222222;color:#a5a5a5;font-size:14px;font-weight:normal;cursor:pointer;text-align:center;letter-spacing:.04em}
-.ss-swap-btn:hover{border-color:#5a9a9a;color:#8ac8c8;background:#1e4a4a}
-.ss-preview{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;padding:0 12px;background:#1a3a3a;border-radius:6px;border:1.5px solid #4a8a8a;color:#fff;height:38px;box-sizing:border-box}
+.ss-mode-row{display:flex;gap:8px;margin-bottom:10px}
+.ss-mode-btn{flex:1;padding:7px 6px;border-radius:6px;border:1.5px solid #383B44;background:#1c1d20;color:#A3A3A3;font-size:12px;font-weight:normal;cursor:pointer;text-align:center;white-space:normal;word-break:break-word;line-height:1.3;transition:all .15s ease-out}
+.ss-mode-btn:hover:not(.active){background:#DD6F4A;border-color:#DD6F4A;color:#fff;opacity:.7}
+.ss-mode-btn.active{background:#DD6F4A;border-color:#DD6F4A;color:#fff}
+.ss-mode-btn:active{filter:brightness(.85);transition:none}
+.ss-res-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;margin-top:0;margin-bottom:10px}
+.ss-res-btn{position:relative;padding:7px 4px;border-radius:6px;border:1.5px solid #383B44;background:#2c2c2e;color:#A3A3A3;font-size:11px;font-weight:normal;cursor:pointer;text-align:center;white-space:normal;word-break:break-word;line-height:1.3;transition:all .15s ease-out}
+.ss-res-btn:hover:not(.active){background:#DD6F4A;border-color:#DD6F4A;color:#fff;opacity:.7}
+.ss-res-btn.active{background:#DD6F4A;border-color:#DD6F4A;color:#fff}
+.ss-res-btn:active{filter:brightness(.85);transition:none}
+.ss-ar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 6px;margin-top:0}
+.ss-ar-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:4px 2px;border-radius:6px;border:1.5px solid #383B44;background:#333336;color:#A3A3A3;cursor:pointer;min-width:0;min-height:44px;overflow:hidden;transition:all .15s ease-out}
+.ss-ar-btn .ar-icon{flex-shrink:0;display:flex;align-items:center;justify-content:center;color:inherit;width:16px;height:16px}
+.ss-wrap .ss-ar-btn .ar-icon svg{display:block;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important}
+.ss-wrap .ss-ar-btn .ar-icon svg rect{fill:none!important;stroke:#A3A3A3!important;stroke-width:1.0!important}
+.ss-wrap .ss-ar-btn:hover:not(.active) .ar-icon svg rect,
+.ss-wrap .ss-ar-btn.active .ar-icon svg rect{stroke:#fff!important}
+.ss-ar-btn .ar-ratio{font-size:11px;font-weight:normal;line-height:1;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:1;width:auto;text-align:center;color:inherit;min-width:0}
+.ss-ar-btn:hover:not(.active){background:#DD6F4A;border-color:#DD6F4A;color:#fff;opacity:.7}
+.ss-ar-btn.active{background:#DD6F4A;border-color:#DD6F4A;color:#fff}
+.ss-ar-btn:active{filter:brightness(.85);transition:none}
+.ss-preview-cell{display:flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1.5px solid #DD6F4A;background:#1c1d20;cursor:default;min-height:33px;overflow:hidden;margin-top:12px}
+.ss-preview-cell-lbl{font-size:12px;color:#A3A3A3;white-space:nowrap}
+.ss-preview-cell-val{font-size:14px;font-weight:normal;font-family:inherit;color:#E4E4E7;letter-spacing:.02em;text-align:center;padding:6px 10px;line-height:1.3}
+.ss-preview-cell.flash,.ss-preview.flash{animation:ss-flash-border .8s ease-in-out}
+.ss-preview-cell.flash .ss-preview-cell-val,.ss-preview.flash .ss-preview-val{animation:ss-flash-text .8s ease-in-out}
+@keyframes ss-flash-border{0%,100%{border-color:#DD6F4A;box-shadow:none}50%{border-color:#DD6F4A;box-shadow:0 0 14px rgba(221,111,74,.55)}}
+@keyframes ss-flash-text{0%,100%{transform:scale(1);color:#E4E4E7}50%{transform:scale(1.15);color:#DD6F4A}}
+/* 自定义模式：版权钉底 —— margin-top:auto 吃掉剩余空间，预览条↔版权 ≥12px，
+   版权↔节点底固定 12px（6px margin + 6px wrap padding），不随高度计算偏差失衡 */
+.ss-mode-manual .ss-copyright{margin-top:auto;padding-top:12px;margin-bottom:6px}
+.ss-swap-btn{width:100%;margin-top:8px;margin-bottom:4px;padding:7px 0;border-radius:6px;border:1.5px solid #383B44;background:#1c1d20;color:#A3A3A3;font-size:14px;font-weight:normal;cursor:pointer;text-align:center;letter-spacing:.04em;transition:all .15s ease-out}
+.ss-swap-btn:hover{background:#DD6F4A;border-color:#DD6F4A;color:#fff}
+.ss-swap-btn:active{filter:brightness(.85);transition:none}
+.ss-preview{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;padding:6px 12px;background:#1c1d20;border-radius:6px;border:1.5px solid #DD6F4A;color:#E4E4E7;min-height:33px;box-sizing:border-box}
 @media(prefers-reduced-motion:reduce){.ss-preview.flash,.ss-preview-cell.flash,.ss-preview.flash .ss-preview-val,.ss-preview-cell.flash .ss-preview-cell-val{animation:none!important}}
-.ss-preview-lbl{font-size:12px;color:#a5a5a5;white-space:nowrap}
-.ss-preview-val{font-size:14px;font-weight:normal;color:#8ac8c8;letter-spacing:.08em;white-space:nowrap}
-.ss-copyright{margin-top:8px;margin-left:-6px;margin-right:-6px;padding:3px 10px;border-top:1px solid #2e2e2e;text-align:center;flex-shrink:0}
-.ss-copyright span{color:#666;font-size:8.5px;letter-spacing:0.5px;white-space:nowrap}
+.ss-preview-lbl{font-size:12px;color:#A3A3A3;white-space:nowrap}
+.ss-preview-val{font-size:14px;font-family:inherit;font-weight:normal;color:#E4E4E7;letter-spacing:.02em;white-space:nowrap}
+.ss-copyright{margin-top:12px;margin-left:0;margin-right:0;padding:6px 4px 0;text-align:center;width:100%;flex-shrink:0;font-size:8.5px;color:#7A7A7A;letter-spacing:.4px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
 `;
 
 // ── 工具函数 ──────────────────────────────────────────────────────────────────
 
-/** 根据模式返回节点固定高度（像素）：自定义模式=315，预设模式=474 */
+/** 根据模式返回节点固定高度（像素）：自定义模式=282，预设模式=360 */
 function getFixedHeight(manual) {
-    return manual ? 315 : 474;
+    return manual ? 282 : 360;
 }
 
 /** 向文档 head 注入 CSS 样式（幂等，多次调用只注入一次） */
@@ -117,29 +147,28 @@ function injectStyles() {
 }
 
 /**
- * 生成单个宽高比的 SVG 图标标记字符串。
+ * 生成单个宽高比的 SVG 图标标记字符串（紧致 viewBox 版）。
+ * SVG 恰好包住线框（无内边空隙），icon 与文字间距即真实 gap，
+ * 组团在按钮内真正居中（旧版固定方形画布导致 icon 两侧有幽灵空白、视觉偏移）。
  * @param {string} ratio - 宽高比键名，如 "16:9"
- * @param {number} S     - SVG 画布边长（像素）
+ * @param {number} H     - 图标长边目标高度（像素）
  * @returns {string} SVG HTML 字符串
  */
-function _buildIcon(ratio, S) {
+function _buildIcon(ratio, H) {
     const [rw, rh] = RATIO_ICON[ratio] || [24, 24];
-    const pad = 4;                                      // 图标内边距
-    const sc = (S - pad * 2) / Math.max(rw, rh);       // 等比缩放系数
-    const w  = Math.round(rw * sc);
-    const h  = Math.round(rh * sc);
-    const x  = pad;                                     // 左对齐（列内图标左边缘对齐）
-    const y  = Math.round((S - h) / 2);                // 垂直居中偏移
-    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" xmlns="http://www.w3.org/2000/svg">`
-         + `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" ry="2" `
-         + `fill="none" stroke="currentColor" stroke-width="1.2"/></svg>`;
+    const sc = H / Math.max(rw, rh);          // 长边贴齐目标高度
+    const w  = Math.max(6, Math.round(rw * sc));
+    const h  = Math.max(6, Math.round(rh * sc));
+    const lw = 1.0, pad = 1.5;                 // 线宽改细（1.0px），pad 保持 1.5 留足抗锯齿空间
+    const vw = w + pad * 2, vh = H + pad * 2;  // 高度盒统一为 H（垂直居中）
+    const y  = pad + Math.round((H - h) / 2);
+    return `<svg width="${vw}" height="${vh}" viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg">`
+         + `<rect x="${pad}" y="${y}" width="${w}" height="${h}" rx="2" ry="2" `
+         + `fill="none" stroke="currentColor" stroke-width="${lw}"/></svg>`;
 }
 
-/**
- * 预计算 SVG 图标缓存（28px）——模块加载时一次性构建，避免每次渲染重复计算。
- * 用于横向布局宽高比按钮（图标在左侧）。
- */
-const ICON_CACHE_SM = Object.fromEntries(Object.keys(RATIO_ICON).map(r => [r, _buildIcon(r, 28)]));
+/** 预计算 SVG 图标缓存（长边 13px，紧致盒）——模块加载时一次性构建，避免每次渲染重复计算。 */
+const ICON_CACHE_SM = Object.fromEntries(Object.keys(RATIO_ICON).map(r => [r, _buildIcon(r, 13)]));
 
 /**
  * 轮询等待指定名称的 widget 全部就绪，然后执行回调。
@@ -166,7 +195,7 @@ function waitForWidgets(node, names, cb, timeout = 3000) {
     return intv;
 }
 
-/** 从完整标签提取短键（"9:16 手机竖图" → "9:16"，纯短键直接返回） */
+/** 从完整标签提取短键（"16:9 Widescreen 标准宽屏" → "16:9"，纯短键直接返回） */
 function _shortAsp(label) {
     if (!label) return DEFAULT_RATIO.split(" ")[0];
     const i = label.indexOf(" ");
@@ -195,6 +224,12 @@ const _prefersReducedMotion = () => _mqlReducedMotion?.matches ?? false;
 function buildUI(node) {
     injectStyles();
 
+    // 注入节点元信息（cnr_id + ver），对齐 ComfyUI 内置节点属性面板格式
+    node.properties = node.properties || {};
+    if (!node.properties.cnr_id) node.properties.cnr_id = "custom-nodes/ComfyUI-Size-Selection";
+    if (!node.properties.ver) node.properties.ver = "2.1";
+    delete node.properties.aux_id;
+
     // 移除所有参数的外部连接端口
     // （五个参数均由自定义 UI 内部控制，不需要外部节点连入）
     if (node.inputs) {
@@ -207,15 +242,15 @@ function buildUI(node) {
 
     // 资源句柄——全部在 onRemoved 中统一清理，防止内存泄漏
     let _waitIntv            = null;
-    let _resizeInterval      = null;
     let _vueMinWidthInterval = null;
     let _vueMinWidthTimeout  = null;
+    let _resizeObserver      = null;
     const _ac = new AbortController();
 
     const _origOnRemoved = node.onRemoved;
     node.onRemoved = () => {
         clearInterval(_waitIntv);
-        clearInterval(_resizeInterval);
+        _resizeObserver?.disconnect();
         clearInterval(_vueMinWidthInterval);
         clearTimeout(_vueMinWidthTimeout);
         _ac.abort();
@@ -225,7 +260,6 @@ function buildUI(node) {
     // 预隐藏原生 widget，避免轮询延迟期间引起错位
     if (node.widgets) {
         for (const w of node.widgets) {
-            if (w.name === "Manual_Mode") continue;
             w.hidden = true;
             w.computeSize = () => [0, -4];
         }
@@ -262,7 +296,7 @@ function buildUI(node) {
         if (cusH) cusH.value = Math.max(MIN_DIMENSION, Math.min(MAX_DIMENSION, cusH.value));
 
         // 校验分辨率/宽高比合法性，不合法时回退到默认值
-        // aspW.value 存完整标签（如 "9:16 手机竖图"），currentAsp 用短键（"9:16"）做 RESOLUTION_DATA 查表
+        // aspW.value 存完整标签（如 "16:9 Widescreen 标准宽屏"），currentAsp 用短键（"16:9"）做 RESOLUTION_DATA 查表
         let currentRes = (resW?.value && RESOLUTION_DATA[resW.value]) ? resW.value : DEFAULT_RES;
         if (resW && resW.value !== currentRes) resW.value = currentRes;
         const _aspShort = _shortAsp(aspW?.value);
@@ -315,15 +349,14 @@ function buildUI(node) {
             }
         }
 
-        // 设置节点最小尺寸（两个模式统一宽度，避免跳变）
+        // 默认宽度 250px（下拉框文字完整显示），最小硬限 220px
         node.minSize = [220, 150];
-        if (node.size[0] < 220) node.size[0] = 220;
+        if (node.size[0] < 220) node.size[0] = 250;
 
         // ── DOM 结构构建 ──────────────────────────────────────────────────────
         const wrap = document.createElement("div");
-        wrap.className = "ss-wrap";
-        wrap.setAttribute("translate", "no");
-        wrap.style.width = (node.size?.[0] || 220) + "px";
+        wrap.className = "ss-wrap" + (isManual ? " ss-mode-manual" : " ss-mode-preset");
+        wrap.setAttribute("translate", "no");        wrap.style.width = (node.size?.[0] || 250) + "px";
 
         const contentDiv = document.createElement("div");
         contentDiv.className = "ss-content";
@@ -370,15 +403,7 @@ function buildUI(node) {
             resBtns[lv] = b;
         }
 
-        // 预览格（嵌入 AR 网格最后一格，预设模式专用）
-        const previewCell = document.createElement("div");
-        previewCell.className = "ss-preview-cell";
-        const previewCellVal = document.createElement("div");
-        previewCellVal.className = "ss-preview-cell-val";
-        previewCellVal.textContent = "-";
-        previewCell.appendChild(previewCellVal);
-
-        // 宽高比按钮（2列配对网格：横向+纵向成对，末行为1:1+预览格）
+        // 宽高比按钮（4列网格）
         const arGrid = document.createElement("div");
         arGrid.className = "ss-ar-grid";
         autoPanel.appendChild(arGrid);
@@ -410,23 +435,27 @@ function buildUI(node) {
             app.graph?.setDirtyCanvas(true, true);
         }
 
-        // 填充 AR 网格（横纵配对 + 末行预览格）
-        for (const [leftRatio, rightRatio] of ASPECT_PAIRS) {
-            const lb = makeArBtn(leftRatio);
-            lb.onclick = () => onAspClick(leftRatio);
-            arGrid.appendChild(lb);
-            aspBtns[leftRatio] = lb;
-
-            if (rightRatio !== null) {
-                const rb = makeArBtn(rightRatio);
-                rb.onclick = () => onAspClick(rightRatio);
-                arGrid.appendChild(rb);
-                aspBtns[rightRatio] = rb;
-            } else {
-                // 末格：尺寸预览
-                arGrid.appendChild(previewCell);
+        // 填充 AR 网格（4列）
+        for (const row of ASPECT_ROWS) {
+            for (const ratio of row) {
+                const b = makeArBtn(ratio);
+                b.onclick = () => onAspClick(ratio);
+                arGrid.appendChild(b);
+                aspBtns[ratio] = b;
             }
         }
+
+        // 预览尺寸单独占一行（底部）
+        const previewCell = document.createElement("div");
+        previewCell.className = "ss-preview-cell";
+        const previewCellLbl = document.createElement("span");
+        previewCellLbl.className = "ss-preview-cell-lbl";
+        previewCellLbl.textContent = "尺寸预览：";
+        const previewCellVal = document.createElement("span");
+        previewCellVal.className = "ss-preview-cell-val";
+        previewCellVal.textContent = "-";
+        previewCell.append(previewCellLbl, previewCellVal);
+        autoPanel.appendChild(previewCell);
 
         contentDiv.appendChild(autoPanel);
 
@@ -456,7 +485,7 @@ function buildUI(node) {
         // 版权栏：仅自定义模式显示，跟随 manPanel 显隐，无需单独切换
         const copyright = document.createElement("div");
         copyright.className = "ss-copyright" + (isManual ? "" : " ss-hidden");
-        copyright.innerHTML = `<span>COPYRIGHT © WOS AI STUDIO | 穿山阅海</span>`;
+        copyright.textContent = "COPYRIGHT © WOSAI STUDIO | 穿山阅海";
 
         wrap.appendChild(preview);
         wrap.appendChild(copyright);
@@ -545,6 +574,9 @@ function buildUI(node) {
             btnAuto.classList.toggle("active", !manual);
             btnMan.classList.toggle("active",   manual);
 
+            wrap.classList.toggle("ss-mode-manual",  manual);
+            wrap.classList.toggle("ss-mode-preset", !manual);
+
             autoPanel.classList.toggle("ss-hidden",  manual);
             manPanel.classList.toggle("ss-hidden",  !manual);
             // 全幅预览条 & 版权栏：仅在自定义模式显示；预设模式使用预览格
@@ -567,7 +599,7 @@ function buildUI(node) {
         function updateNodeHeight() {
             const h = getFixedHeight(isManual);
             _targetHeight = h;
-            const curW = node.size?.[0] || 220;
+            const curW = node.size?.[0] || 250;
             node.size = [curW, h];
             wrap.style.width = curW + "px";
             if (node.element?.style) {
@@ -646,7 +678,7 @@ function buildUI(node) {
         bindCustomDimWidget(cusW, (v) => { baseWidth  = v; });
         bindCustomDimWidget(cusH, (v) => { baseHeight = v; });
 
-        // 覆盖 computeSize：锁定高度，同步 wrap 宽度
+        // 覆盖 computeSize：先调用原始计算，再应用 minSize 限制（参考 WOSAI）
         const _origComputeSize = node.computeSize?.bind(node);
         node.computeSize = function (out) {
             const s = _origComputeSize
@@ -663,11 +695,11 @@ function buildUI(node) {
         // 应用初始模式（根据已保存的 manW.value）
         applyMode(isManual);
 
-        // 下一帧计算版权栏实际宽度，动态设置节点最小尺寸（保持与初始化一致的最小宽度）
+        // 下一帧计算版权栏实际宽度，动态设置节点最小尺寸
+        // 最小宽度以版权文字宽度为准，fallback 220px（与新节点默认宽度无关）
         requestAnimationFrame(() => {
-            const copyrightSpan = copyright.querySelector("span");
-            const textW = (copyrightSpan && copyrightSpan.scrollWidth > 0)
-                ? copyrightSpan.scrollWidth
+            const textW = copyright.scrollWidth > 0
+                ? copyright.scrollWidth
                 : 220;
             const minW  = Math.max(textW + 16, 220);
             const minH  = 45 + 12 + (copyright.offsetHeight || 44);
@@ -698,7 +730,7 @@ function buildUI(node) {
             applyVueMinWidth();
         });
 
-        // ── 高度/宽度监测定时器（500ms，标签页隐藏时自动暂停）────────────────
+        // ── 高度/宽度监测（ResizeObserver，替代 setInterval）───────────────────
         let _lastHeight   = node.size[1];
         let _resizePaused = document.hidden;
 
@@ -709,7 +741,8 @@ function buildUI(node) {
         );
 
         let _lastWidth = node.size[0];
-        _resizeInterval = setInterval(() => {
+        // ResizeObserver 替代 setInterval：事件驱动，页面不可见时自动暂停，更高效
+        _resizeObserver = new ResizeObserver(() => {
             if (_resizePaused || !node.size) return;
             const curH = node.size[1];
             const curW = node.size[0];
@@ -720,7 +753,8 @@ function buildUI(node) {
             if (curH === _lastHeight) return;
             _lastHeight = curH;
             if (curH !== _targetHeight) updateNodeHeight();
-        }, 500);
+        });
+        _resizeObserver.observe(wrap);
     });
 }
 

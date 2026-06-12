@@ -1,4 +1,4 @@
-# ComfyUI-Size-Selection v2.0 — 运行时依赖
+# ComfyUI-Size-Selection v2.1 — 运行时依赖
 # ──────────────────────────────────────────
 # 本插件无第三方运行时依赖。
 # 仅使用 Python 标准库（math 模块），
